@@ -1,6 +1,6 @@
 import { ApolloServer, gql } from "apollo-server";
 
-const tweets = [
+let tweets = [
   {
     id: "1",
     text: "first hello",
@@ -42,6 +42,23 @@ const resolvers = {
     tweet(root, { id }) { // 2번째 인자에서 아규먼트 가져올수있음
       return tweets.find((tweet) => tweet.id === id);
     },
+  },
+
+  Mutation: {
+    postTweet(_, { text, userId }) {
+      const newTweet = {
+        id: tweets.length + 1,
+        text,
+      };
+      tweets.push(newTweet);
+      return newTweet;
+    },
+    deleteTweet(_, {id}) {
+      const tweet = tweets.find(tweet=> tweet.id ===id);
+      if (!tweet) return false;
+      tweets = tweets.filter(tweet => tweet.id !== id);
+      return true;
+    }
   },
 };
 
