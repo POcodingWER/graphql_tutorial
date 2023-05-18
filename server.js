@@ -4,10 +4,12 @@ let tweets = [
   {
     id: "1",
     text: "first hello",
+    userId: "2",
   },
   {
     id: "2",
     text: "second hello",
+    userId: "1",
   },
 ];
 let users = [
@@ -84,6 +86,11 @@ const resolvers = {
       // console.log(root);
       return `${firstName} ${lastName}`;
     },
+  },
+  Tweet: {
+    author({userId}) {
+      return users.find(user=>user.id === userId);
+    }
   },
 };
 
