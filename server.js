@@ -1,4 +1,5 @@
 import { ApolloServer, gql } from "apollo-server";
+import fetch from "node-fetch";
 /*
 소스 보는곳
 아폴로 : https://studio.apollographql.com/sandbox/schema/reference/objects/Mutation
@@ -47,10 +48,11 @@ const typeDefs = gql`
     author: User
   }
   type Query {
+    allMovies: [Movie!]!
     allUsers: [User!]!
     allTweets: [Tweet!]!
     tweet(id: ID!): Tweet
-    ping: String!
+    movie(id: String!): Movie
   }
   type Mutation {
     postTweet(text: String!, userId: ID!): Tweet
@@ -59,6 +61,32 @@ const typeDefs = gql`
     못찾으면 false
     """
     deleteTweet(id: ID!): Boolean!
+  }
+  """
+  REST API -> GQL바꾸는법
+  """
+  type Movie {
+    id: Int!
+    url: String!
+    imdb_code: String!
+    title: String!
+    title_english: String!
+    title_long: String!
+    slug: String!
+    year: Int!
+    rating: Float!
+    runtime: Float!
+    genres: [String]!
+    summary: String
+    description_full: String!
+    synopsis: String
+    yt_trailer_code: String!
+    language: String!
+    background_image: String!
+    background_image_original: String!
+    small_cover_image: String!
+    medium_cover_image: String!
+    large_cover_image: String!
   }
 `;
 
@@ -75,8 +103,17 @@ const resolvers = {
       console.log("allUsers called!");
       return users;
     },
+    allMovies() {
+      return fetch("https://yts.mx/api/v2/list_movies.json")
+        .then((r) => r.json())
+        .then((json) => json.data.movies);
+    },
+    movie(_, { id }) {
+      return fetch(`https://yts.mx/api/v2/movie_details.json?movie_id=${id}`)
+        .then((r) => r.json())
+        .then((json) => json.data.movie);
+    },
   },
-
   Mutation: {
     postTweet(_, { text, userId }) {
       const newTweet = {
@@ -93,7 +130,6 @@ const resolvers = {
       return true;
     },
   },
-
   User: {
     fullName({ firstName, lastName }) {
       console.log("fullName called!");
