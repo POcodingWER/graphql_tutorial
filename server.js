@@ -10,13 +10,24 @@ let tweets = [
     text: "second hello",
   },
 ];
-
+let users = [
+  {
+    id: "1",
+    firstName: "pi",
+    lastName: "zza",
+  },
+  {
+    id: "2",
+    firstName: "kim",
+    lastName: "bob",
+  },
+];
 const typeDefs = gql`
   type User {
     id: ID!
-    userName: String!
     firstName: String!
-    lastName: String
+    lastName: String!
+    fullName: String!
   }
   type Tweet {
     id: ID!
@@ -24,6 +35,7 @@ const typeDefs = gql`
     author: User
   }
   type Query {
+    allUsers: [User!]!
     allTweets: [Tweet!]!
     tweet(id: ID!): Tweet
     ping: String!
@@ -39,8 +51,13 @@ const resolvers = {
     allTweets() {
       return tweets;
     },
-    tweet(root, { id }) { // 2번째 인자에서 아규먼트 가져올수있음
+    tweet(root, { id }) {
+      // 2번째 인자에서 아규먼트 가져올수있음
       return tweets.find((tweet) => tweet.id === id);
+    },
+    allUsers() {
+      console.log("allUsers called!");
+      return users;
     },
   },
 
@@ -53,12 +70,20 @@ const resolvers = {
       tweets.push(newTweet);
       return newTweet;
     },
-    deleteTweet(_, {id}) {
-      const tweet = tweets.find(tweet=> tweet.id ===id);
+    deleteTweet(_, { id }) {
+      const tweet = tweets.find((tweet) => tweet.id === id);
       if (!tweet) return false;
-      tweets = tweets.filter(tweet => tweet.id !== id);
+      tweets = tweets.filter((tweet) => tweet.id !== id);
       return true;
-    }
+    },
+  },
+
+  User: {
+    fullName({ firstName, lastName }) {
+      console.log("fullName called!");
+      // console.log(root);
+      return `${firstName} ${lastName}`;
+    },
   },
 };
 
