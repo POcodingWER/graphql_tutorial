@@ -1,5 +1,9 @@
 import { ApolloServer, gql } from "apollo-server";
-
+/*
+소스 보는곳
+아폴로 : https://studio.apollographql.com/sandbox/schema/reference/objects/Mutation
+알타 : https://altair-gql.sirmuel.design/
+*/
 let tweets = [
   {
     id: "1",
@@ -29,8 +33,14 @@ const typeDefs = gql`
     id: ID!
     firstName: String!
     lastName: String!
+    """
+    문자열로서의 firstName + lastName의 합
+    """
     fullName: String!
   }
+  """
+  Tweet object represents a resource for  a Tweet
+  """
   type Tweet {
     id: ID!
     text: String!
@@ -44,6 +54,10 @@ const typeDefs = gql`
   }
   type Mutation {
     postTweet(text: String!, userId: ID!): Tweet
+    """
+    찾으면 true
+    못찾으면 false
+    """
     deleteTweet(id: ID!): Boolean!
   }
 `;
@@ -88,9 +102,9 @@ const resolvers = {
     },
   },
   Tweet: {
-    author({userId}) {
-      return users.find(user=>user.id === userId);
-    }
+    author({ userId }) {
+      return users.find((user) => user.id === userId);
+    },
   },
 };
 
